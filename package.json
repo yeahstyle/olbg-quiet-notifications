@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/dpa99c/cordova-plugin-firebase"
   },
-  "name": "cordova-plugin-firebasex",
+  "name": "olbg-quiet-notifications",
   "version": "6.0.7",
   "description": "Cordova plugin for Google Firebase",
   "cordova": {
