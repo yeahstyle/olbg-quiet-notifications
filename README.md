@@ -1,7 +1,7 @@
-cordova-plugin-firebasex [![Latest Stable Version](https://img.shields.io/npm/v/cordova-plugin-firebasex.svg)](https://www.npmjs.com/package/cordova-plugin-firebasex) [![Total Downloads](https://img.shields.io/npm/dt/cordova-plugin-firebasex.svg)](https://npm-stat.com/charts.html?package=cordova-plugin-firebasex)
+olbg-quiet-notifications
 ========================
 
-This plugin is a fork of [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) which has been rework to fix issues and add new functionality.
+This plugin is a fork of [cordova-plugin-firebasex](https://github.com/dpa99c/cordova-plugin-firebasex) which has been rework to fix issues and add new functionality.
 
 It brings push notifications, analytics, event tracking, crash reporting and more from Google Firebase to your Cordova project.
 
