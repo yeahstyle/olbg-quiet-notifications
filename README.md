@@ -66,7 +66,9 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [onTokenRefresh](#ontokenrefresh)
       - [onMessageReceived](#onmessagereceived)
       - [grantPermission](#grantpermission)
+      - [grantPermissionProvisional](#grantpermissionProvisional)
       - [hasPermission](#haspermission)
+      - [hasPermissionProvisional](#haspermissionProvisional)
       - [unregister](#unregister)
       - [setBadgeNumber](#setbadgenumber)
       - [getBadgeNumber](#getbadgenumber)
@@ -946,12 +948,41 @@ window.FirebasePlugin.grantPermission(function(hasPermission){
     console.log("Permission was " + (hasPermission ? "granted" : "denied"));
 });
 ```
+
+#### grantPermissionProvisional
+Grant provisional permission to receive quiet push notifications if it is available.
+On iOs12+, it grants provisional permission for quiet notifications,
+On iOs versions less than 12, it grants permission to receive push notifications (it behaves the same as 'grantPermission').
+
+(will trigger prompt) and return `hasPermission: true`.
+iOS only (Android will always return true).
+
+```
+window.FirebasePlugin.grantPermissionProvisional(function(hasPermission){
+    console.log("Permission was " + (hasPermission ? "granted" : "denied"));
+});
+```
+
+
 #### hasPermission
 Check permission to receive push notifications and return the result to a callback function as boolean.
 On iOS, returns true is runtime permission for remote notifications is granted and enabled in Settings.
 On Android, returns true if remote notifications are enabled.
 ```
 window.FirebasePlugin.hasPermission(function(hasPermission){
+    console.log("Permission is " + (hasPermission ? "granted" : "denied"));
+});
+```
+
+#### hasPermissionProvisional
+Check permission to receive quiet push notifications if it is available and return the result to a callback function as boolean.
+On iOS12+, returns true if runtime permission for remote quiet notifications is granted and enabled in Settings.
+On iOs versions less than 12, returns true if runtime permission for remote quiet notifications is granted and enabled in Settings (same as 'hasPermission').
+On Android, returns true if remote notifications are enabled.
+
+
+```
+window.FirebasePlugin.hasPermissionProvisional(function(hasPermission){
     console.log("Permission is " + (hasPermission ? "granted" : "denied"));
 });
 ```
