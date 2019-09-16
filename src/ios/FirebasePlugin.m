@@ -106,18 +106,14 @@ static BOOL registeredForRemoteNotifications = NO;
             @try {
                 BOOL enabled = NO;
                 if (@available(iOS 12.0, *)) {
-                    if (settings.alertSetting == UNNotificationSettingEnabled || settings.authorizationStatus == UNAuthorizationStatusProvisional) {
+                    if (settings.authorizationStatus == UNAuthorizationStatusProvisional) {
                         enabled = YES;
                         [self registerForRemoteNotifications];
                     }
-                } else {
-                    // Fallback on earlier versions
-                    if (settings.alertSetting == UNNotificationSettingEnabled) {
-                        enabled = YES;
-                        [self registerForRemoteNotifications];
-                    }
+                } else {             
+                        enabled = NO;
                 }
-                NSLog(@"_hasPermission: %@", enabled ? @"YES" : @"NO");
+                NSLog(@"_hasPermissionProvisional: %@", enabled ? @"YES" : @"NO");
                 completeBlock(enabled);
             }@catch (NSException *exception) {
                 [self handlePluginExceptionWithoutContext:exception];
@@ -195,40 +191,43 @@ static BOOL registeredForRemoteNotifications = NO;
 - (void)grantPermissionProvisional:(CDVInvokedUrlCommand *)command {
     NSLog(@"grantPermissionProvisional");
     @try {
-        [self _hasPermission:^(BOOL enabled) {
+        [self _hasPermissionProvisional:^(BOOL enabled) {
             @try {
                 if(enabled){
                     NSString* message = @"PermissionProvisional is already granted - call hasPermissionProvisional() to check before calling grantPermission()";
                     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:message];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-                }else{
+                } else {
                     [UNUserNotificationCenter currentNotificationCenter].delegate = (id<UNUserNotificationCenterDelegate> _Nullable) self;
-                    UNAuthorizationOptions authOptions = UNAuthorizationOptionAlert|UNAuthorizationOptionSound|UNAuthorizationOptionBadge;
+                    UNAuthorizationOptions authOptions = UNAuthorizationOptionProvisional;
                     if (@available(iOS 12.0, *)) {
-                        authOptions |= UNAuthorizationOptionProvisional;
-                    }
-                    
-                    [[UNUserNotificationCenter currentNotificationCenter]
-                     requestAuthorizationWithOptions:authOptions
-                     completionHandler:^(BOOL granted, NSError * _Nullable error) {
-                         @try {
-                             NSLog(@"requestAuthorizationWithOptions: granted=%@", granted ? @"YES" : @"NO");
-                             CDVPluginResult* pluginResult;
-                             if (error == nil) {
-                                 if(granted){
-                                     [self registerForRemoteNotifications];
+                        authOptions = UNAuthorizationOptionProvisional;
+                        [[UNUserNotificationCenter currentNotificationCenter]
+                         requestAuthorizationWithOptions:authOptions
+                         completionHandler:^(BOOL granted, NSError * _Nullable error) {
+                             @try {
+                                 NSLog(@"requestAuthorizationWithOptions: granted=%@", granted ? @"YES" : @"NO");
+                                 CDVPluginResult* pluginResult;
+                                 if (error == nil) {
+                                     if(granted){
+                                         [self registerForRemoteNotifications];
+                                     }
+                                     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:granted];
+                                 }else{
+                                     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
                                  }
-                                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:granted];
-                             }else{
-                                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+                                 [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                             }@catch (NSException *exception) {
+                                 [self handlePluginExceptionWithContext:exception :command];
                              }
-                             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-                         }@catch (NSException *exception) {
-                             [self handlePluginExceptionWithContext:exception :command];
                          }
-                     }
-                     ];
-                    
+                         ];
+                    } else {
+                        CDVPluginResult* pluginResult;
+                        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Not supported"];
+
+                        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                    }                  
                 }
             }@catch (NSException *exception) {
                 [self handlePluginExceptionWithContext:exception :command];
